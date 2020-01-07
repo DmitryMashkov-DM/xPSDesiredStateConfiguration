@@ -210,7 +210,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $Checksum
+        $Checksum,
+
+        [Parameter()]
+        [System.Boolean]
+        $UseCache = $true
     )
 
     # Validate Uri
@@ -370,7 +374,7 @@ function Set-TargetResource
     }
 
     # Update cache
-    if (Test-Path -Path $DestinationPath)
+    if ($UseCache -and (Test-Path -Path $DestinationPath))
     {
         $downloadedFile = Get-Item -Path $DestinationPath
         $lastWriteTime = $downloadedFile.LastWriteTimeUtc
@@ -497,20 +501,26 @@ function Test-TargetResource
             if ($MatchSource)
             {
                 $file = Get-Item -Path $DestinationPath
-                # Getting cache. It's cleared every time user runs Start-DscConfiguration
-                $cache = Get-Cache -DestinationPath $DestinationPath -Uri $Uri
 
-                if ($null -ne $cache `
-                        -and ($cache.LastWriteTime -eq $file.LastWriteTimeUtc) `
-                        -and ($cache.FileSize -eq $file.Length))
-                {
-                    Write-Verbose -Message $script:localizedData.CacheReflectsCurrentState
-                    $fileExists = $true
-                }
-                else
-                {
-                    Write-Verbose -Message $script:localizedData.CacheIsEmptyOrNotMatchCurrentState
-                }
+				if($UseCache) {
+					# Getting cache. It's cleared every time user runs Start-DscConfiguration
+					$cache = Get-Cache -DestinationPath $DestinationPath -Uri $Uri
+
+					if ($null -ne $cache `
+							-and ($cache.LastWriteTime -eq $file.LastWriteTimeUtc) `
+							-and ($cache.FileSize -eq $file.Length))
+					{
+						Write-Verbose -Message $script:localizedData.CacheReflectsCurrentState
+						$fileExists = $true
+					}
+					else
+					{
+						Write-Verbose -Message $script:localizedData.CacheIsEmptyOrNotMatchCurrentState
+					}
+				} else {
+					$fileExists = ($null -ne $file)
+				}
+				
             }
             else
             {

@@ -1,5 +1,5 @@
 
-[ClassVersion("1.0.0.0"), FriendlyName("xRemoteFile")]
+[ClassVersion("1.1.0.0"), FriendlyName("xRemoteFile")]
 class DSC_xRemoteFile : OMI_BaseResource
 {
     [Key, Description("Path under which downloaded or copied file should be accessible after operation.")] String DestinationPath;
@@ -14,4 +14,5 @@ class DSC_xRemoteFile : OMI_BaseResource
     [Write, Description("Uses a proxy server for the request, rather than connecting directly to the Internet resource. Should be the URI of a network proxy server (e.g 'http://10.20.30.1').")] String Proxy;
     [Write, Description("Specifies a user account that has permission to use the proxy server that is specified by the Proxy parameter."), EmbeddedInstance("MSFT_Credential")] String ProxyCredential;
     [Read, Description("Says whether DestinationPath exists on the machine."), ValueMap{"Present", "Absent"}, Values{"Present", "Absent"}] String Ensure;
+	[Write, Description("A boolean value to indicate whether the cache should be used. The default value is true.")] Boolean UseCache;
 };
